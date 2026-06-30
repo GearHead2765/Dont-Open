@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fate Corruption</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background: radial-gradient(circle, #1a1a1a 0%, #060606 100%);
+        overflow: hidden;
+        font-family: Arial;
+        color: #e6e6e6;
+        transition: background 1.5s ease;
+    }
+
+    /* LAYERED “AWARENESS” BACKGROUND */
+    body::before {
+        content: "";
+        position: fixed;
+        width: 220%;
+        height: 220%;
+        top: -60%;
+        left: -60%;
+
+        background:
+            radial-gradient(circle at 20% 20%, rgba(150,0,0,0.10), transparent 45%),
+            radial-gradient(circle at 80% 40%, rgba(90,0,120,0.10), transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(0,0,0,0.7), transparent 60%);
+
+        animation: drift 18s infinite linear;
+        pointer-events: none;
+    }
+
+    @keyframes drift {
+        0% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(2deg) scale(1.08); }
+        100% { transform: rotate(0deg) scale(1); }
+    }
+
+    /* hidden whisper layer */
+    #whisper {
+        position: absolute;
+        font-size: 18px;
+        opacity: 0.08;
+        color: #ff2b2b;
+        pointer-events: none;
+        transform: translateY(-200px);
+        white-space: nowrap;
+    }
+
+    .container {
+        text-align: center;
+        z-index: 2;
+    }
+
+    input, button {
+        padding: 10px;
+        font-size: 16px;
+        background: #151515;
+        border: 1px solid #444;
+        color: #e6e6e6;
+    }
+
+    button { cursor: pointer; margin-left: 5px; }
+
+    #nameAbove {
+        font-family: "Creepster", cursive;
+        color: #d15cff;
+        font-size: 48px;
+        text-shadow: 0 0 10px #ff2b2b, 0 0 30px #7a00ff;
+        opacity: 0;
+    }
+
+    #display {
+        font-size: 30px;
+        margin-top: 15px;
+        line-height: 1.5;
+    }
+
+    .horror {
+        font-family: "Creepster", cursive;
+        color: #ff2b2b;
+        font-size: 72px;
+        text-shadow: 0 0 30px red, 0 0 80px black;
+    }
+
+    .shake {
+        animation: shake 0.08s infinite;
+    }
+
+    @keyframes shake {
+        0% { transform: translate(0,0); }
+        25% { transform: translate(2px,-2px); }
+        50% { transform: translate(-2px,2px); }
+        75% { transform: translate(2px,2px); }
+        100% { transform: translate(0,0); }
+    }
+
+    .flash {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: white;
+        animation: flash 1.5s forwards;
+        z-index: 999;
+        pointer-events: none;
+    }
+
+    @keyframes flash {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .blood {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(120,0,0,0.75), rgba(0,0,0,0.95));
+        animation: drip 8s forwards;
+        pointer-events: none;
+    }
+
+    @keyframes drip {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+</style>
+</head>
+
+<body>
+
+<div id="whisper"></div>
+
+<div class="container">
+
+    <div id="nameAbove"></div>
+
+    <input id="nameInput" placeholder="Type a name">
+    <button onclick="start()" id="btn">Enter</button>
+
+    <div id="display"></div>
+</div>
+
+<script>
+const msgs = [
+    "IT IS WATCHING",
+    "YOU SHOULDN'T BE HERE",
+    "IT ALREADY KNOWS",
+    "DON'T TRUST THIS SCREEN",
+    "IT IS LEARNING YOU",
+    "SOMETHING IS WRONG",
+    "YOU ARE NOT ALONE"
+];
+
+const whispers = [
+    "…it sees you…",
+    "…don’t finish typing…",
+    "…too late…",
+    "…it knows…"
+];
+
+function pick(a){ return a[Math.floor(Math.random()*a.length)] }
+
+function scramble(t){
+    const c="!@#$%^&*()-_=+[]{}<>?/\\|";
+    return t.split("").map(x=>Math.random()>0.5?c[Math.random()*c.length|0]:x).join("");
+}
+
+/* PRE-AWARENESS WHISPER LOOP */
+setInterval(()=>{
+    let w=document.getElementById("whisper");
+    w.innerText=pick(whispers);
+    w.style.left=Math.random()*80+"%";
+    w.style.top=Math.random()*80+"%";
+}, 3000);
+
+function start(){
+
+    let input=document.getElementById("nameInput");
+    let btn=document.getElementById("btn");
+    let display=document.getElementById("display");
+    let nameAbove=document.getElementById("nameAbove");
+
+    let name=input.value;
+    if(!name)return;
+
+    /* PHASE 1: SCRAMBLE + DISTORTION */
+    document.body.classList.add("shake");
+
+    let g=setInterval(()=>input.value=scramble(name),60);
+
+    setTimeout(()=>{
+        clearInterval(g);
+        input.value="";
+    },1800);
+
+    setTimeout(()=>{input.style.opacity="0";btn.style.opacity="0";},2400);
+
+    /* PHASE 2: FIRST CONTACT */
+    setTimeout(()=>{
+        display.className="horror";
+        display.innerText=pick(msgs);
+    },3800);
+
+    /* PHASE 3: BEHAVIOR CHANGE */
+    setTimeout(()=>display.innerText=pick(msgs),5600);
+    setTimeout(()=>display.innerText=pick(msgs),7200);
+
+    /* PHASE 4: “FALSE CALM” */
+    setTimeout(()=>{
+        display.innerHTML="IT IS<br>VERY QUIET<br>NOW";
+    },9000);
+
+    /* PHASE 5: BREAK */
+    setTimeout(()=>{
+        display.innerText="FATE IS NOT REAL";
+    },10500);
+
+    /* PHASE 6: COLLAPSE */
+    setTimeout(()=>{
+        document.body.classList.remove("shake");
+
+        let f=document.createElement("div");
+        f.className="flash";
+        document.body.appendChild(f);
+    },11800);
+
+    /* PHASE 7: BLACKOUT */
+    setTimeout(()=>{
+        document.body.style.background="black";
+        display.style.opacity="0";
+    },13200);
+
+    /* PHASE 8: RETURN + NAME */
+    setTimeout(()=>{
+
+        let b=document.createElement("div");
+        b.className="blood";
+        document.body.appendChild(b);
+
+        nameAbove.style.opacity="1";
+        nameAbove.innerText=name;
+
+        /* erase identity */
+        setTimeout(()=>{
+            let i=name.length;
+
+            let back=setInterval(()=>{
+                nameAbove.innerText=nameAbove.innerText.slice(0,-1);
+                i--;
+                if(i<=0){
+
+                    clearInterval(back);
+
+                    /* FINAL ENTITY MESSAGE */
+                    let m=pick(msgs);
+                    let w=m.split(" ");
+                    let j=0;
+
+                    nameAbove.innerText="";
+
+                    let type=setInterval(()=>{
+                        nameAbove.innerText+=w[j]+" ";
+                        j++;
+                        if(j>=w.length)clearInterval(type);
+                    },600);
+                }
+            },60);
+
+        },2200);
+
+    },15000);
+
+    /* RESET */
+    setTimeout(()=>{
+
+        document.body.classList.remove("shake");
+        document.body.style.background="radial-gradient(circle,#1a1a1a 0%,#060606 100%)";
+
+        input.style.opacity="1";
+        btn.style.opacity="1";
+
+        input.value="";
+        display.innerText="";
+        display.className="";
+        nameAbove.innerText="";
+        nameAbove.style.opacity="0";
+
+        document.querySelectorAll(".blood,.flash").forEach(e=>e.remove());
+
+    },24000);
+}
+</script>
+
+</body>
+</html>
